@@ -85,6 +85,10 @@ EOF
 ## Key Patterns (§12)
 $(grep -A50 "^## §12" "$AGENTS_FILE" | head -30 || echo "None yet")
 
+### CRITICAL: Use --disable-sandbox for Swift builds
+SwiftPM sandbox causes "sandbox-exec: Operation not permitted" in some environments.
+Always use: `swift build --disable-sandbox && swift test --disable-sandbox`
+
 EOF
 
     # Story details
@@ -164,8 +168,8 @@ verify_completion() {
     passes=$(jq -r ".stories[] | select(.id == \"$story_id\") | .passes" "$PRD_FILE")
     [ "$passes" != "true" ] && log_warning "prd.json not updated" && return 1
     
-    # Verify build
-    swift build && swift build -c release && swift test --verbose
+    # Verify build (--disable-sandbox needed in sandboxed environments)
+    swift build --disable-sandbox && swift build -c release --disable-sandbox && swift test --disable-sandbox --verbose
 }
 
 run_iteration() {

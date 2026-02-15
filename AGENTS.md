@@ -371,6 +371,17 @@ let request = SFSpeechURLRecognitionRequest(url: audioFile)
 request.requiresOnDeviceRecognition = true
 ```
 
+### Pattern: SwiftPM Sandbox Workaround
+In sandboxed environments (Codex, CI), SwiftPM sandbox causes errors:
+```
+sandbox-exec: sandbox_apply: Operation not permitted
+```
+Always use `--disable-sandbox` flag:
+```bash
+swift build --disable-sandbox
+swift test --disable-sandbox
+```
+
 ---
 
 ## §13 — Anti-Patterns (Don't Do This)
