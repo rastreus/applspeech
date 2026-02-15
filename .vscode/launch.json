@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:applspeech}",
+            "name": "Debug applspeech",
+            "target": "applspeech",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug applspeech"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:applspeech}",
+            "name": "Release applspeech",
+            "target": "applspeech",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release applspeech"
+        }
+    ]
+}
