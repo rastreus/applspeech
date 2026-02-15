@@ -14,7 +14,6 @@ struct SupportedAudioFormatTests {
 
   @Test("Unknown extension returns nil")
   func unknownExtension() {
-    #expect(SupportedAudioFormat.from(URL(fileURLWithPath: "/tmp/a.ogg")) == nil)
+    #expect(SupportedAudioFormat.from(URL(fileURLWithPath: "/tmp/a.aac")) == nil)
   }
 }
-

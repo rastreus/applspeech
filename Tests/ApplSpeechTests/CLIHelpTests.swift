@@ -8,6 +8,7 @@ struct CLIHelpTests {
     let text = HelpText.render()
     #expect(text.contains("USAGE:"))
     #expect(text.contains("--help"))
+    #expect(text.contains("--locale"))
     #expect(text.contains("transcribe"))
   }
 }

@@ -3,3 +3,11 @@
 Initialized: 2026-02-14T12:00:00Z
 
 2026-02-15T03:12:27Z Completed S01-project-setup (builds, help, tests).
+2026-02-14T20:58:20Z Completed S02-transcribe-file (file transcription using SpeechTranscriber + SpeechAnalyzer)
+2026-02-15T06:17:20Z Completed S03-json-output (--format json flag, JSON output with text/file/language)
+2026-02-15T06:32:45Z Completed S04-locale-support (--locale flag, default en-US, passed to transcriber)
+2026-02-15T07:03:12Z Completed S05-url-transcription (http/https URL download, network error handling)
+2026-02-15T07:10:00Z Completed S06-telegram-source (tg:// scheme for Telegram Bot API)
+2026-02-15T07:32:45Z Completed S07-stdin-pipe (stdin support with - flag)
+2026-02-15T07:35:57Z Completed S08-speechanalyzer (analyze command for voice characteristics)
+2026-02-15T07:40:00Z Completed S09-cli-polish (--version flag, improved help, examples)

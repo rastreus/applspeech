@@ -20,7 +20,9 @@
       "id": "S02-transcribe-file",
       "title": "File transcription",
       "description": "Core: transcribe local audio files using SpeechTranscriber offline API",
-      "dependencies": ["S01-project-setup"],
+      "dependencies": [
+        "S01-project-setup"
+      ],
       "acceptance_criteria": [
         "applspeech transcribe <file> works",
         "Supports flac, wav, m4a, mp3",
@@ -28,39 +30,45 @@
         "Returns transcribed text"
       ],
       "priority": 2,
-      "passes": false
+      "passes": true
     },
     {
       "id": "S03-json-output",
       "title": "JSON output",
       "description": "JSON output format for programmatic use by AI agents",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "--format json flag",
         "Includes text, confidence, segments",
         "Parseable by scripts"
       ],
       "priority": 3,
-      "passes": false
+      "passes": true
     },
     {
       "id": "S04-locale-support",
       "title": "Locale selection",
       "description": "Language/locale selection with automatic model download",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "--locale flag (e.g., en-US)",
         "Auto-download model if needed",
         "Default to system locale"
       ],
       "priority": 4,
-      "passes": false
+      "passes": true
     },
     {
       "id": "S05-url-transcription",
       "title": "URL transcription",
       "description": "Transcribe remote audio files via HTTP/HTTPS URL",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "applspeech transcribe https://... works",
         "Downloads and processes",
@@ -73,7 +81,9 @@
       "id": "S06-telegram-source",
       "title": "Telegram audio source",
       "description": "Receive and transcribe audio from Telegram messages",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "Process voice messages",
         "Download from Telegram",
@@ -86,7 +96,9 @@
       "id": "S07-stdin-pipe",
       "title": "Stdin/pipe support",
       "description": "Accept audio via stdin for pipeline usage",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "cat audio.m4a | applspeech transcribe -",
         "Works in pipelines",
@@ -99,7 +111,9 @@
       "id": "S08-speechanalyzer",
       "title": "SpeechAnalyzer voice analysis",
       "description": "Voice analysis (pitch, tempo) via SpeechAnalyzer API",
-      "dependencies": ["S02-transcribe-file"],
+      "dependencies": [
+        "S02-transcribe-file"
+      ],
       "acceptance_criteria": [
         "applspeech analyze command",
         "Returns voice characteristics",
@@ -112,7 +126,11 @@
       "id": "S09-cli-polish",
       "title": "CLI polish",
       "description": "Help text, examples, error messages",
-      "dependencies": ["S03-json-output", "S04-locale-support", "S06-telegram-source"],
+      "dependencies": [
+        "S03-json-output",
+        "S04-locale-support",
+        "S06-telegram-source"
+      ],
       "acceptance_criteria": [
         "Complete --help",
         "README with examples",

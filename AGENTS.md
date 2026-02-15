@@ -371,6 +371,16 @@ let request = SFSpeechURLRecognitionRequest(url: audioFile)
 request.requiresOnDeviceRecognition = true
 ```
 
+### Pattern: SpeechAnalyzer Actor Semantics
+`SpeechAnalyzer` is an `actor`. Its initializer is actor-isolated, so construct it with `try await`,
+then call `start(inputAudioFile:finishAfterFile:)` while consuming module results.
+```swift
+let analyzer = try await SpeechAnalyzer(inputAudioFile: audioFile, modules: [transcriber], finishAfterFile: true)
+let analysisTask = Task { try await analyzer.start(inputAudioFile: audioFile, finishAfterFile: true) }
+for try await result in transcriber.results { /* ... */ }
+try await analysisTask.value
+```
+
 ### Pattern: SwiftPM Sandbox Workaround
 In sandboxed environments (Codex, CI), SwiftPM sandbox causes errors:
 ```
