@@ -1,19 +1,26 @@
 # AGENTS.md — Project Policy & Workflow
 
-> **Project**: applspeech — Swift CLI for local speech transcription using Speech framework
-> **Stack**: Swift 6.2.3, Speech framework, SpeechTranscriber/SpeechAnalyzer APIs
+> **Project**: applspeech — Swift CLI for on-device speech transcription
+> **Stack**: Swift 6.2.3, Speech framework (SpeechTranscriber/SpeechAnalyzer APIs)
 > **VCS**: Jujutsu (jj)
 > **Workflow**: TCR (test || commit || revert)
+> **Focus**: Optimized for AI agent usage (programmable, JSON output, stdin/pipe)
 
 ---
 
 ## §1 — Project Identity
 
-**applspeech** is a command-line tool for transcribing and analyzing audio using Apple's on-device Speech framework. It supports live transcription, file-based transcription, and speech analysis.
+**applspeech** is a command-line tool for transcribing and analyzing audio using Apple's on-device Speech framework. Designed primarily for **AI agent usage** — simple, scriptable, JSON-first output.
 
-**Target users**: Bot accounts, automation scripts, CLI workflows, accessibility tools
+**Target users**: AI agents (like me), automation scripts, CLI workflows
 **Target platform**: macOS 26.0+ (Sonoma or later, required for SpeechTranscriber API)
 **Binary name**: `applspeech`
+
+### Design Principles for AI Agents
+- **JSON-first**: Default output is JSON for easy parsing
+- **Stdin/pipe friendly**: Works in Unix pipelines  
+- **Single purpose**: One thing (transcription), done well
+- **No GUI**: Pure CLI, no UI elements
 
 ---
 

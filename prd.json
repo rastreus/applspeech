@@ -1,157 +1,124 @@
 {
   "project": "applspeech",
   "branchName": "main",
-  "description": "CLI for on-device speech transcription using SpeechTranscriber API",
+  "description": "CLI for on-device speech transcription - optimized for AI agent usage",
   "stories": [
     {
       "id": "S01-project-setup",
-      "title": "Project setup and Package.swift",
-      "description": "Initialize Swift package with basic structure, Package.swift, and entry point",
+      "title": "Project setup",
+      "description": "Initialize Swift package with Package.swift and basic entry point",
       "dependencies": [],
       "acceptance_criteria": [
-        "Package.swift is valid and builds",
-        "Basic CLI entry point exists",
-        "App runs and shows help",
+        "Package.swift builds successfully",
+        "Basic CLI shows help",
         "Test suite runs"
       ],
       "priority": 1,
       "passes": false
     },
     {
-      "id": "S02-basic-commands",
-      "title": "Basic command structure",
-      "description": "Set up ArgumentParser with transcribe command and basic flags",
+      "id": "S02-transcribe-file",
+      "title": "File transcription",
+      "description": "Core: transcribe local audio files using SpeechTranscriber offline API",
       "dependencies": ["S01-project-setup"],
       "acceptance_criteria": [
-        "applspeech --help works",
-        "applspeech --version works",
-        "Transcribe subcommand registered"
+        "applspeech transcribe <file> works",
+        "Supports flac, wav, m4a, mp3",
+        "On-device transcription (privacy)",
+        "Returns transcribed text"
       ],
       "priority": 2,
       "passes": false
     },
     {
-      "id": "S03-speechtranscriber-api",
-      "title": "SpeechTranscriber API integration",
-      "description": "Integrate SpeechTranscriber API from Speech framework for on-device transcription",
-      "dependencies": ["S01-project-setup"],
+      "id": "S03-json-output",
+      "title": "JSON output",
+      "description": "JSON output format for programmatic use by AI agents",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "SpeechTranscriber initialized",
-        "SpeechAnalyzer integration working",
-        "Authorization requested for speech recognition",
-        "Handles denied/restricted/notDetermined states"
+        "--format json flag",
+        "Includes text, confidence, segments",
+        "Parseable by scripts"
       ],
       "priority": 3,
       "passes": false
     },
     {
-      "id": "S04-offline-transcription",
-      "title": "Offline file transcription",
-      "description": "Implement offline transcription from audio files using SpeechTranscriber.offlineTranscription",
-      "dependencies": ["S03-speechtranscriber-api"],
+      "id": "S04-locale-support",
+      "title": "Locale selection",
+      "description": "Language/locale selection with automatic model download",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "Transcribe audio file from --input-audio-path",
-        "Support audio formats: flac, wav, m4a, mp3",
-        "Output to --output-txt-path",
-        "Handle unsupported formats gracefully"
+        "--locale flag (e.g., en-US)",
+        "Auto-download model if needed",
+        "Default to system locale"
       ],
       "priority": 4,
       "passes": false
     },
     {
-      "id": "S05-live-transcription",
-      "title": "Live transcription mode",
-      "description": "Implement live/progressive transcription using SpeechTranscriber.progressiveLiveTranscription",
-      "dependencies": ["S03-speechtranscriber-api"],
+      "id": "S05-url-transcription",
+      "title": "URL transcription",
+      "description": "Transcribe remote audio files via HTTP/HTTPS URL",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "--live flag enables live transcription",
-        "Real-time transcription from microphone",
-        "Handle start/stop/interruption",
-        "Progressive output updates"
+        "applspeech transcribe https://... works",
+        "Downloads and processes",
+        "Handles network errors"
       ],
       "priority": 5,
       "passes": false
     },
     {
-      "id": "S06-locale-selection",
-      "title": "Locale and model management",
-      "description": "Add locale selection and automatic speech model download",
-      "dependencies": ["S04-offline-transcription"],
+      "id": "S06-telegram-source",
+      "title": "Telegram audio source",
+      "description": "Receive and transcribe audio from Telegram messages",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "--locale flag for language selection",
-        "Automatic model download if not installed",
-        "Default to system locale",
-        "List available locales"
+        "Process voice messages",
+        "Download from Telegram",
+        "Return transcription"
       ],
       "priority": 6,
       "passes": false
     },
     {
-      "id": "S07-output-formats",
-      "title": "Output format options",
-      "description": "Add JSON, plain text, and formatted output options",
-      "dependencies": ["S04-offline-transcription"],
+      "id": "S07-stdin-pipe",
+      "title": "Stdin/pipe support",
+      "description": "Accept audio via stdin for pipeline usage",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "--format json output",
-        "--format plain output",
-        "Include confidence scores in output",
-        "Support AttributedString output"
+        "cat audio.m4a | applspeech transcribe -",
+        "Works in pipelines",
+        "Compatible with curl |"
       ],
       "priority": 7,
       "passes": false
     },
     {
-      "id": "S08-speechanalyzer-integration",
-      "title": "SpeechAnalyzer API for voice analysis",
-      "description": "Add SpeechAnalyzer API for voice analysis (pitch, tempo, voice biometrics)",
-      "dependencies": ["S04-offline-transcription"],
+      "id": "S08-speechanalyzer",
+      "title": "SpeechAnalyzer voice analysis",
+      "description": "Voice analysis (pitch, tempo) via SpeechAnalyzer API",
+      "dependencies": ["S02-transcribe-file"],
       "acceptance_criteria": [
-        "Analyze audio for voice characteristics",
-        "Return analysis results",
-        "Handle unsupported audio",
-        "Output analysis in requested format"
+        "applspeech analyze command",
+        "Returns voice characteristics",
+        "Works on audio files"
       ],
       "priority": 8,
       "passes": false
     },
     {
-      "id": "S09-url-transcription",
-      "title": "URL-based transcription",
-      "description": "Add support for transcribing remote audio files via HTTP/HTTPS URL",
-      "dependencies": ["S04-offline-transcription"],
+      "id": "S09-cli-polish",
+      "title": "CLI polish",
+      "description": "Help text, examples, error messages",
+      "dependencies": ["S03-json-output", "S04-locale-support", "S06-telegram-source"],
       "acceptance_criteria": [
-        "Accept HTTP/HTTPS URLs for audio",
-        "Download and transcribe",
-        "Handle network errors gracefully"
+        "Complete --help",
+        "README with examples",
+        "User-friendly errors"
       ],
       "priority": 9,
-      "passes": false
-    },
-    {
-      "id": "S10-telegram-integration",
-      "title": "Telegram bot integration",
-      "description": "Add ability to receive and transcribe audio from Telegram messages via Gateway",
-      "dependencies": ["S04-offline-transcription"],
-      "acceptance_criteria": [
-        "Receive voice messages from Telegram",
-        "Download audio from Telegram",
-        "Transcribe and return results",
-        "Handle non-voice messages gracefully"
-      ],
-      "priority": 10,
-      "passes": false
-    },
-    {
-      "id": "S11-cli-polish",
-      "title": "CLI polish and documentation",
-      "description": "Final polish: examples, better help text, README",
-      "dependencies": ["S06-locale-selection", "S07-output-formats", "S10-telegram-integration"],
-      "acceptance_criteria": [
-        "Complete README with examples",
-        "Help text for all commands and flags",
-        "Error messages are user-friendly"
-      ],
-      "priority": 11,
       "passes": false
     }
   ]
