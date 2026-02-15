@@ -45,6 +45,35 @@ struct CommandParserTests {
     )
   }
 
+  @Test("status -> status command")
+  func statusCommand() {
+    #expect(
+      CommandParser.parse(arguments: ["status"])
+        == .status(format: .text, localeIdentifier: "en-US")
+    )
+  }
+
+  @Test("authorize flags -> authorize command")
+  func authorizeCommand() {
+    #expect(
+      CommandParser.parse(arguments: [
+        "authorize",
+        "--locale",
+        "es-ES",
+        "--microphone",
+        "--download-model",
+        "--format",
+        "json",
+      ])
+        == .authorize(
+          format: .json,
+          localeIdentifier: "es-ES",
+          requestMicrophone: true,
+          downloadModel: true
+        )
+    )
+  }
+
   @Test("Unknown args -> unknown")
   func unknownArgs() {
     #expect(CommandParser.parse(arguments: ["wat"]) == .unknown(arguments: ["wat"]))
