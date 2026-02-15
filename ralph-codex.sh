@@ -4,6 +4,9 @@ set -euo pipefail
 # ralph-codex.sh — Optimized for minimal context pollution
 # Focus: Compact context, JSON output, only essential info
 
+# Add homebrew to PATH
+export PATH="$HOME/homebrew/bin:$PATH"
+
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRD_FILE="$SCRIPT_DIR/prd.json"
 PROGRESS_FILE="$SCRIPT_DIR/progress.txt"
