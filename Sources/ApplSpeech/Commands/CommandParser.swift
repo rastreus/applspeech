@@ -8,7 +8,12 @@ enum OutputFormat: String, Equatable, Sendable {
 enum ApplSpeechCommand: Equatable {
   case help
   case version
-  case transcribe(filePath: String?, format: OutputFormat, localeIdentifier: String)
+  case transcribe(
+    filePath: String?,
+    format: OutputFormat,
+    localeIdentifier: String,
+    engine: SpeechEngine
+  )
   case analyze(filePath: String?, format: OutputFormat)
   case status(format: OutputFormat, localeIdentifier: String)
   case authorize(
@@ -39,6 +44,7 @@ enum CommandParser {
       var filePath: String?
       var format: OutputFormat = .text
       var localeIdentifier = "en-US"
+      var engine: SpeechEngine = .auto
 
       var index = 0
       while index < remaining.count {
@@ -73,6 +79,21 @@ enum CommandParser {
           localeIdentifier = String(arg.dropFirst("--locale=".count))
           index += 1
           continue
+        } else if arg == "--engine" {
+          if index + 1 < remaining.count {
+            if let value = parseEngine(remaining[index + 1]) {
+              engine = value
+            }
+            index += 2
+            continue
+          }
+        } else if arg.hasPrefix("--engine=") {
+          let rawValue = String(arg.dropFirst("--engine=".count))
+          if let value = parseEngine(rawValue) {
+            engine = value
+          }
+          index += 1
+          continue
         } else if !arg.hasPrefix("-") && filePath == nil {
           filePath = arg
           index += 1
@@ -82,7 +103,12 @@ enum CommandParser {
         index += 1
       }
 
-      return .transcribe(filePath: filePath, format: format, localeIdentifier: localeIdentifier)
+      return .transcribe(
+        filePath: filePath,
+        format: format,
+        localeIdentifier: localeIdentifier,
+        engine: engine
+      )
     }
 
     if arguments.first == "analyze" {
@@ -233,5 +259,18 @@ enum CommandParser {
     }
 
     return .unknown(arguments: arguments)
+  }
+}
+
+private func parseEngine(_ value: String) -> SpeechEngine? {
+  switch value.lowercased() {
+  case "auto":
+    return .auto
+  case "legacy", "sf", "sfspeechrecognizer":
+    return .sfSpeechRecognizer
+  case "modern", "transcriber", "speechtranscriber":
+    return .speechTranscriber
+  default:
+    return nil
   }
 }

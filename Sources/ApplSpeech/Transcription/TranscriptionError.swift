@@ -15,6 +15,9 @@ enum TranscriptionError: Error, CustomStringConvertible, Equatable, Sendable {
   case telegramAPIInvalidPayload(operation: String)
   case speechNotAvailable
   case speechNotAuthorized
+  case speechTranscriberNotAvailable
+  case speechTranscriberLocaleUnsupported(localeIdentifier: String)
+  case speechTranscriberModelNotInstalled(localeIdentifier: String)
   case noFinalResult
   case transcriptionFailed(message: String)
 
@@ -49,6 +52,12 @@ enum TranscriptionError: Error, CustomStringConvertible, Equatable, Sendable {
       return "speech recognition is not available on this device"
     case .speechNotAuthorized:
       return "speech recognition is not authorized"
+    case .speechTranscriberNotAvailable:
+      return "SpeechTranscriber API is not available on this OS"
+    case .speechTranscriberLocaleUnsupported(let localeIdentifier):
+      return "SpeechTranscriber does not support locale: \(localeIdentifier)"
+    case .speechTranscriberModelNotInstalled(let localeIdentifier):
+      return "SpeechTranscriber model is not installed for locale: \(localeIdentifier)"
     case .noFinalResult:
       return "no transcription result produced"
     case .transcriptionFailed(let message):

@@ -17,7 +17,7 @@ struct CommandParserTests {
   func transcribeWithFile() {
     #expect(
       CommandParser.parse(arguments: ["transcribe", "a.wav"])
-        == .transcribe(filePath: "a.wav", format: .text, localeIdentifier: "en-US")
+        == .transcribe(filePath: "a.wav", format: .text, localeIdentifier: "en-US", engine: .auto)
     )
   }
 
@@ -25,7 +25,7 @@ struct CommandParserTests {
   func transcribeMissingFile() {
     #expect(
       CommandParser.parse(arguments: ["transcribe"])
-        == .transcribe(filePath: nil, format: .text, localeIdentifier: "en-US")
+        == .transcribe(filePath: nil, format: .text, localeIdentifier: "en-US", engine: .auto)
     )
   }
 
@@ -33,7 +33,7 @@ struct CommandParserTests {
   func transcribeWithJsonFormat() {
     #expect(
       CommandParser.parse(arguments: ["transcribe", "--format", "json", "a.wav"])
-        == .transcribe(filePath: "a.wav", format: .json, localeIdentifier: "en-US")
+        == .transcribe(filePath: "a.wav", format: .json, localeIdentifier: "en-US", engine: .auto)
     )
   }
 
@@ -41,7 +41,20 @@ struct CommandParserTests {
   func transcribeWithLocale() {
     #expect(
       CommandParser.parse(arguments: ["transcribe", "--locale", "es-ES", "a.wav"])
-        == .transcribe(filePath: "a.wav", format: .text, localeIdentifier: "es-ES")
+        == .transcribe(filePath: "a.wav", format: .text, localeIdentifier: "es-ES", engine: .auto)
+    )
+  }
+
+  @Test("transcribe --engine legacy <file> -> legacy engine")
+  func transcribeWithEngine() {
+    #expect(
+      CommandParser.parse(arguments: ["transcribe", "--engine", "legacy", "a.wav"])
+        == .transcribe(
+          filePath: "a.wav",
+          format: .text,
+          localeIdentifier: "en-US",
+          engine: .sfSpeechRecognizer
+        )
     )
   }
 

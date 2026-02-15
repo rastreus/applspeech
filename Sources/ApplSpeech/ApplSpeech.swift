@@ -4,6 +4,7 @@ struct TranscribeOutput: Codable {
   let text: String
   let file: String
   let language: String
+  let engine: String
 }
 
 @main
@@ -23,7 +24,12 @@ struct ApplSpeech {
       print("applspeech \(version)")
       return
 
-    case .transcribe(filePath: let filePath, format: let format, localeIdentifier: let localeIdentifier):
+    case .transcribe(
+      filePath: let filePath,
+      format: let format,
+      localeIdentifier: let localeIdentifier,
+      engine: let engine
+    ):
       guard let filePath else {
         if format == .json {
           let error = ["ok": false, "error": ["code": "missing_file", "message": "missing audio file path"]] as [String: Any]
@@ -41,11 +47,19 @@ struct ApplSpeech {
       do {
         let resolved = try await AudioInputResolver.resolve(filePath)
         defer { resolved.cleanup() }
-        let transcriber = SpeechFileTranscriber(localeIdentifier: localeIdentifier)
+        let (transcriber, engineUsed) = try await makeFileTranscriber(
+          engine: engine,
+          localeIdentifier: localeIdentifier
+        )
         let text = try await transcriber.transcribeFile(at: resolved.localFileURL)
 
         if format == .json {
-          let output = TranscribeOutput(text: text, file: filePath, language: localeIdentifier)
+          let output = TranscribeOutput(
+            text: text,
+            file: filePath,
+            language: localeIdentifier,
+            engine: engineUsed.rawValue
+          )
           let encoder = JSONEncoder()
           encoder.outputFormatting = []
           if let data = try? encoder.encode(output),
@@ -245,6 +259,32 @@ private func renderStatusText(_ status: SpeechEnvironmentStatus) -> String {
   return lines.joined(separator: "\n")
 }
 
+private func makeFileTranscriber(
+  engine: SpeechEngine,
+  localeIdentifier: String
+) async throws -> (any FileTranscribing, SpeechEngine) {
+  switch engine {
+  case .sfSpeechRecognizer:
+    return (SpeechFileTranscriber(localeIdentifier: localeIdentifier), .sfSpeechRecognizer)
+
+  case .speechTranscriber:
+    guard #available(macOS 26.0, *) else {
+      throw TranscriptionError.speechTranscriberNotAvailable
+    }
+    return (SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber)
+
+  case .auto:
+    if #available(macOS 26.0, *) {
+      let modelStatus = await SpeechTranscriberModelSupport.status(localeIdentifier: localeIdentifier)
+      if modelStatus.available && modelStatus.modelInstalled == true {
+        return (SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber)
+      }
+    }
+
+    return (SpeechFileTranscriber(localeIdentifier: localeIdentifier), .sfSpeechRecognizer)
+  }
+}
+
 enum HelpText {
   static func render() -> String {
     """
@@ -253,9 +293,9 @@ enum HelpText {
     USAGE:
       applspeech [--help]
       applspeech [--version]
-      applspeech transcribe <file-or-url> [--format json] [--locale en-US]
-      applspeech transcribe - [--format json] [--locale en-US]
-      applspeech transcribe tg:<telegram_file_id> [--format json] [--locale en-US]
+      applspeech transcribe <file-or-url> [--format json] [--locale en-US] [--engine auto]
+      applspeech transcribe - [--format json] [--locale en-US] [--engine auto]
+      applspeech transcribe tg:<telegram_file_id> [--format json] [--locale en-US] [--engine auto]
       applspeech analyze <file-or-url> [--format json]
       applspeech status [--format json] [--locale en-US]
       applspeech authorize [--format json] [--locale en-US] [--microphone] [--download-model]
@@ -273,6 +313,7 @@ enum HelpText {
       -v, --version        Show version number
       --format json        Output JSON format (default: text)
       --locale <bcp47>    Locale identifier (default: en-US, e.g., es-ES, fr-FR)
+      --engine <name>     Transcription engine: auto, legacy (SFSpeechRecognizer), modern (SpeechTranscriber)
       --microphone         Also request microphone permission (used for live transcription)
       --download-model     Download SpeechTranscriber model for --locale (if supported)
 
