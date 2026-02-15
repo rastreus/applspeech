@@ -4,8 +4,8 @@ set -euo pipefail
 # ralph-codex.sh — Optimized for minimal context pollution
 # Focus: Compact context, JSON output, only essential info
 
-# Add homebrew to PATH
-export PATH="$HOME/homebrew/bin:$PATH"
+# Add homebrew, pnpm, and nvm to PATH
+export PATH="$HOME/homebrew/bin:$HOME/Library/pnpm:$HOME/.nvm/versions/node/v24.13.1/bin:$PATH"
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PRD_FILE="$SCRIPT_DIR/prd.json"
