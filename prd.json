@@ -14,7 +14,7 @@
         "Test suite runs"
       ],
       "priority": 1,
-      "passes": false
+      "passes": true
     },
     {
       "id": "S02-transcribe-file",
