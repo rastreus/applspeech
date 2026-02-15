@@ -29,14 +29,17 @@ struct SpeechTranscriberFileTranscriber: FileTranscribing {
     }
 
     let requested = Locale(identifier: localeIdentifier)
-    guard let supportedLocale = await SpeechTranscriber.supportedLocale(equivalentTo: requested) else {
-      throw TranscriptionError.speechTranscriberLocaleUnsupported(localeIdentifier: localeIdentifier)
+    guard let supportedLocale = await SpeechTranscriber.supportedLocale(equivalentTo: requested)
+    else {
+      throw TranscriptionError.speechTranscriberLocaleUnsupported(
+        localeIdentifier: localeIdentifier)
     }
 
     let installed = await SpeechTranscriber.installedLocales
     let installedSet = Set(installed.map { normalizeLocaleIdentifier($0.identifier) })
     guard installedSet.contains(normalizeLocaleIdentifier(supportedLocale.identifier)) else {
-      throw TranscriptionError.speechTranscriberModelNotInstalled(localeIdentifier: supportedLocale.identifier)
+      throw TranscriptionError.speechTranscriberModelNotInstalled(
+        localeIdentifier: supportedLocale.identifier)
     }
 
     let transcriber = SpeechTranscriber(locale: supportedLocale, preset: .progressiveTranscription)
@@ -44,7 +47,9 @@ struct SpeechTranscriberFileTranscriber: FileTranscribing {
     let analyzer = SpeechAnalyzer(modules: modules)
 
     let audioFile = try AVAudioFile(forReading: url)
-    let analysisTask = Task { try await analyzer.start(inputAudioFile: audioFile, finishAfterFile: true) }
+    let analysisTask = Task {
+      try await analyzer.start(inputAudioFile: audioFile, finishAfterFile: true)
+    }
 
     var text = ""
     for try await result in transcriber.results {
@@ -65,4 +70,3 @@ struct SpeechTranscriberFileTranscriber: FileTranscribing {
 private func normalizeLocaleIdentifier(_ identifier: String) -> String {
   identifier.replacingOccurrences(of: "_", with: "-").lowercased()
 }
-

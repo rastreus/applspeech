@@ -49,7 +49,8 @@ enum SpeechEnvironment {
     let legacy = legacyStatus(localeIdentifier: localeIdentifier)
     let transcriber = await SpeechTranscriberModelSupport.status(localeIdentifier: localeIdentifier)
 
-    let readyLegacy = speech == .authorized && legacy.available && (legacy.recognizerAvailable ?? false)
+    let readyLegacy =
+      speech == .authorized && legacy.available && (legacy.recognizerAvailable ?? false)
     let readyTranscriber =
       speech == .authorized && transcriber.available && (transcriber.modelInstalled ?? false)
 
@@ -102,4 +103,3 @@ enum SpeechEnvironment {
     )
   }
 }
-

@@ -137,7 +137,7 @@ private func detectFormatFromData(_ data: Data) -> SupportedAudioFormat? {
   if data.count >= 2 {
     let bytes = data.prefix(2)
     if bytes[0] == 0xFF { return .mp3 }
-    if bytes[0] == 0x49 && bytes[1] == 0x44 { return .mp3 } // ID3
+    if bytes[0] == 0x49 && bytes[1] == 0x44 { return .mp3 }  // ID3
   }
   // M4A/OGG: check common patterns - default to m4a for now
   // Could check for ftyp atom for M4A
@@ -151,7 +151,9 @@ private enum TelegramBotAPI {
     return trimmed.isEmpty ? nil : trimmed
   }
 
-  static func getFilePath(fileID: String, botToken: String, urlSession: URLSession) async throws -> String {
+  static func getFilePath(fileID: String, botToken: String, urlSession: URLSession) async throws
+    -> String
+  {
     var components = URLComponents()
     components.scheme = "https"
     components.host = "api.telegram.org"
@@ -166,7 +168,8 @@ private enum TelegramBotAPI {
     do {
       (data, response) = try await urlSession.data(from: url)
     } catch let error as URLError {
-      throw TranscriptionError.telegramAPINetworkError(operation: "getFile", code: error.code.rawValue)
+      throw TranscriptionError.telegramAPINetworkError(
+        operation: "getFile", code: error.code.rawValue)
     }
 
     guard let httpResponse = response as? HTTPURLResponse else {
@@ -194,7 +197,9 @@ private enum TelegramBotAPI {
     return filePath
   }
 
-  static func downloadFile(filePath: String, botToken: String, urlSession: URLSession) async throws -> Data {
+  static func downloadFile(filePath: String, botToken: String, urlSession: URLSession) async throws
+    -> Data
+  {
     guard let url = URL(string: "https://api.telegram.org/file/bot\(botToken)/\(filePath)") else {
       throw TranscriptionError.telegramAPIInvalidPayload(operation: "download")
     }
@@ -203,7 +208,8 @@ private enum TelegramBotAPI {
     do {
       (data, response) = try await urlSession.data(from: url)
     } catch let error as URLError {
-      throw TranscriptionError.telegramAPINetworkError(operation: "download", code: error.code.rawValue)
+      throw TranscriptionError.telegramAPINetworkError(
+        operation: "download", code: error.code.rawValue)
     }
 
     guard let httpResponse = response as? HTTPURLResponse else {

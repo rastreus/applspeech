@@ -1,4 +1,5 @@
 import Testing
+
 @testable import ApplSpeech
 
 @Suite("Transcription Errors")
@@ -13,4 +14,3 @@ struct TranscriptionErrorTests {
     #expect(err.description.contains("supported: mp3, wav"))
   }
 }
-

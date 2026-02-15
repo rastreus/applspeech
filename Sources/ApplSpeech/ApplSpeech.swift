@@ -25,18 +25,11 @@ struct ApplSpeech {
       return
 
     case .transcribe(
-      filePath: let filePath,
-      format: let format,
-      localeIdentifier: let localeIdentifier,
-      engine: let engine
+      let filePath, let format, let localeIdentifier, let engine
     ):
       guard let filePath else {
         if format == .json {
-          let error = ["ok": false, "error": ["code": "missing_file", "message": "missing audio file path"]] as [String: Any]
-          if let data = try? JSONSerialization.data(withJSONObject: error),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "missing_file", message: "missing audio file path")
         } else {
           fputs("error: missing audio file path\n", stderr)
           print(HelpText.render())
@@ -63,7 +56,8 @@ struct ApplSpeech {
           let encoder = JSONEncoder()
           encoder.outputFormatting = []
           if let data = try? encoder.encode(output),
-             let json = String(data: data, encoding: .utf8) {
+            let json = String(data: data, encoding: .utf8)
+          {
             print(json)
           }
         } else {
@@ -71,40 +65,22 @@ struct ApplSpeech {
         }
       } catch let error as TranscriptionError {
         if format == .json {
-          let errorDict: [String: Any] = [
-            "ok": false,
-            "error": ["code": "transcription_error", "message": error.description]
-          ]
-          if let data = try? JSONSerialization.data(withJSONObject: errorDict),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "transcription_error", message: error.description)
         } else {
           fputs("error: \(error.description)\n", stderr)
         }
       } catch {
         if format == .json {
-          let errorDict: [String: Any] = [
-            "ok": false,
-            "error": ["code": "unknown", "message": String(describing: error)]
-          ]
-          if let data = try? JSONSerialization.data(withJSONObject: errorDict),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "unknown", message: String(describing: error))
         } else {
           fputs("error: \(String(describing: error))\n", stderr)
         }
       }
 
-    case .analyze(filePath: let filePath, format: let format):
+    case .analyze(let filePath, let format):
       guard let filePath else {
         if format == .json {
-          let error = ["ok": false, "error": ["code": "missing_file", "message": "missing audio file path"]] as [String: Any]
-          if let data = try? JSONSerialization.data(withJSONObject: error),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "missing_file", message: "missing audio file path")
         } else {
           fputs("error: missing audio file path\n", stderr)
           print(HelpText.render())
@@ -122,7 +98,8 @@ struct ApplSpeech {
           let encoder = JSONEncoder()
           encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
           if let data = try? encoder.encode(analysis),
-             let json = String(data: data, encoding: .utf8) {
+            let json = String(data: data, encoding: .utf8)
+          {
             print(json)
           }
         } else {
@@ -135,33 +112,19 @@ struct ApplSpeech {
         }
       } catch let error as VoiceAnalysisError {
         if format == .json {
-          let errorDict: [String: Any] = [
-            "ok": false,
-            "error": ["code": "analysis_error", "message": error.description]
-          ]
-          if let data = try? JSONSerialization.data(withJSONObject: errorDict),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "analysis_error", message: error.description)
         } else {
           fputs("error: \(error.description)\n", stderr)
         }
       } catch {
         if format == .json {
-          let errorDict: [String: Any] = [
-            "ok": false,
-            "error": ["code": "unknown", "message": String(describing: error)]
-          ]
-          if let data = try? JSONSerialization.data(withJSONObject: errorDict),
-             let json = String(data: data, encoding: .utf8) {
-            fputs(json, stderr)
-          }
+          writeJSONError(code: "unknown", message: String(describing: error))
         } else {
           fputs("error: \(String(describing: error))\n", stderr)
         }
       }
 
-    case .status(format: let format, localeIdentifier: let localeIdentifier):
+    case .status(let format, let localeIdentifier):
       let status = await SpeechEnvironment.status(localeIdentifier: localeIdentifier)
       if format == .json {
         writeJSON(status, prettyPrinted: true)
@@ -170,10 +133,7 @@ struct ApplSpeech {
       }
 
     case .authorize(
-      format: let format,
-      localeIdentifier: let localeIdentifier,
-      requestMicrophone: let requestMicrophone,
-      downloadModel: let downloadModel
+      let format, let localeIdentifier, let requestMicrophone, let downloadModel
     ):
       do {
         let status = try await SpeechEnvironment.authorize(
@@ -194,7 +154,7 @@ struct ApplSpeech {
         }
       }
 
-    case .unknown(arguments: let arguments):
+    case .unknown(let arguments):
       fputs("error: unknown arguments: \(arguments.joined(separator: " "))\n", stderr)
       print(HelpText.render())
     }
@@ -271,13 +231,18 @@ private func makeFileTranscriber(
     guard #available(macOS 26.0, *) else {
       throw TranscriptionError.speechTranscriberNotAvailable
     }
-    return (SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber)
+    return (
+      SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber
+    )
 
   case .auto:
     if #available(macOS 26.0, *) {
-      let modelStatus = await SpeechTranscriberModelSupport.status(localeIdentifier: localeIdentifier)
+      let modelStatus = await SpeechTranscriberModelSupport.status(
+        localeIdentifier: localeIdentifier)
       if modelStatus.available && modelStatus.modelInstalled == true {
-        return (SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber)
+        return (
+          SpeechTranscriberFileTranscriber(localeIdentifier: localeIdentifier), .speechTranscriber
+        )
       }
     }
 

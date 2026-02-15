@@ -13,4 +13,3 @@ enum MicrophoneAuthorization {
     }
   }
 }
-

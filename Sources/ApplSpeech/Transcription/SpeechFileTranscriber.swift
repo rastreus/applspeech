@@ -45,8 +45,9 @@ struct SpeechFileTranscriber: FileTranscribing {
     return try await withCheckedThrowingContinuation { continuation in
       recognizer.recognitionTask(with: request) { result, error in
         if let error = error {
-          continuation.resume(throwing: TranscriptionError.transcriptionFailed(
-            message: String(describing: error))
+          continuation.resume(
+            throwing: TranscriptionError.transcriptionFailed(
+              message: String(describing: error))
           )
           return
         }

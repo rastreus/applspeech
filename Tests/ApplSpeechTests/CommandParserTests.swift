@@ -1,4 +1,5 @@
 import Testing
+
 @testable import ApplSpeech
 
 @Suite("Command Parsing")
