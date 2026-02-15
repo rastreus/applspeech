@@ -381,6 +381,26 @@ for try await result in transcriber.results { /* ... */ }
 try await analysisTask.value
 ```
 
+### Pattern: SpeechTranscriber Availability + Deployment Targets
+`SpeechTranscriber`, `SpeechAnalyzer`, and `AssetInventory` are only available on macOS 26.0+.
+If you set `Package.swift` to `.macOS(.v26)` and run tests on an older OS, the test bundle will fail
+to load at runtime.
+
+Recommended setup for agent/CI machines on older macOS:
+```swift
+// Package.swift
+platforms: [.macOS(.v15)]
+```
+
+Then gate modern APIs in code:
+```swift
+if #available(macOS 26.0, *) {
+  // SpeechTranscriber / SpeechAnalyzer / AssetInventory code
+} else {
+  // Fallback (SFSpeechRecognizer) or "unavailable" status
+}
+```
+
 ### Pattern: SwiftPM Sandbox Workaround
 In sandboxed environments (Codex, CI), SwiftPM sandbox causes errors:
 ```
